@@ -160,7 +160,9 @@ async function executeModel(
         key: sessionKey,
         model: args.trim(),
       }),
-      client.request<{ models: ModelCatalogEntry[] }>("models.list", {}),
+      client
+        .request<{ models: ModelCatalogEntry[] }>("models.list", {})
+        .catch(() => ({ models: [] as ModelCatalogEntry[] })),
     ]);
     const catalog = models?.models ?? [];
     const patchedModel = patched.resolved?.model ?? args.trim();
