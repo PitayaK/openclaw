@@ -2,6 +2,19 @@ import { html, nothing } from "lit";
 import type { SkillMessageMap } from "../controllers/skills.ts";
 import { clampText } from "../format.ts";
 import type { SkillStatusEntry, SkillStatusReport } from "../types.ts";
+
+/** Only allow http/https URLs as clickable links; reject javascript: etc. */
+function safeExternalHref(raw: string | undefined): string | null {
+  if (!raw) {
+    return null;
+  }
+  try {
+    const u = new URL(raw);
+    return u.protocol === "http:" || u.protocol === "https:" ? u.toString() : null;
+  } catch {
+    return null;
+  }
+}
 import { groupSkills } from "./skills-grouping.ts";
 import {
   computeSkillMissing,
@@ -322,13 +335,14 @@ function renderSkillDetail(skill: SkillStatusEntry, props: SkillsProps) {
                         props.onEdit(skill.skillKey, (e.target as HTMLInputElement).value)}
                     />
                   </div>
-                  ${
-                    skill.homepage
+                  ${(() => {
+                    const href = safeExternalHref(skill.homepage);
+                    return href
                       ? html`<div class="muted" style="font-size: 13px;">
-                        Get your key: <a href="${skill.homepage}" target="_blank" rel="noopener">${skill.homepage}</a>
+                        Get your key: <a href="${href}" target="_blank" rel="noopener noreferrer">${href}</a>
                       </div>`
-                      : nothing
-                  }
+                      : nothing;
+                  })()}
                   <button
                     class="btn primary"
                     ?disabled=${busy}
@@ -344,7 +358,12 @@ function renderSkillDetail(skill: SkillStatusEntry, props: SkillsProps) {
           <div style="border-top: 1px solid var(--border); padding-top: 12px; display: grid; gap: 6px; font-size: 12px; color: var(--muted);">
             <div><span style="font-weight: 600;">Source:</span> ${skill.source}</div>
             <div style="font-family: var(--mono); word-break: break-all;">${skill.filePath}</div>
-            ${skill.homepage ? html`<div><a href="${skill.homepage}" target="_blank" rel="noopener">${skill.homepage}</a></div>` : nothing}
+            ${(() => {
+              const href = safeExternalHref(skill.homepage);
+              return href
+                ? html`<div><a href="${href}" target="_blank" rel="noopener noreferrer">${href}</a></div>`
+                : nothing;
+            })()}
           </div>
         </div>
       </div>

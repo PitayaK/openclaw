@@ -341,7 +341,7 @@ export function formatSkillsCheck(report: SkillStatusReport, opts: SkillsCheckOp
     lines.push(theme.heading("Ready to use:"));
     for (const skill of eligible) {
       const emoji = normalizeSkillEmoji(skill.emoji);
-      lines.push(`  ${emoji} ${skill.name}`);
+      lines.push(`  ${emoji} ${sanitizeSkillField(skill.name)}`);
     }
   }
 
@@ -351,7 +351,7 @@ export function formatSkillsCheck(report: SkillStatusReport, opts: SkillsCheckOp
     for (const skill of missingReqs) {
       const emoji = normalizeSkillEmoji(skill.emoji);
       const missing = formatSkillMissingSummary(skill);
-      lines.push(`  ${emoji} ${skill.name} ${theme.muted(`(${missing})`)}`);
+      lines.push(`  ${emoji} ${sanitizeSkillField(skill.name)} ${theme.muted(`(${missing})`)}`);
     }
   }
 
